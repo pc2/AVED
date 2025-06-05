@@ -31,6 +31,12 @@
  #define READ_WRITE               (0666)
  #define IS_ROOT_USER(uid, euid)  (capable(CAP_DAC_OVERRIDE) || (uid == ROOT_USER) || (euid == ROOT_USER))
  
+ // Providing OS Support for RHEL/rocky.
+#if defined(RHEL_RELEASE_CODE)
+#if RHEL_RELEASE_CODE >= RHEL_RELEASE_VERSION(9, 4)
+#define RHEL_9_4_GE
+#endif
+#endif
  
  static int dev_major = 0;  /* This will be overriden. */
  
@@ -42,7 +48,7 @@
   * 
   * Return: NULL.
   */
- #if LINUX_VERSION_CODE >= KERNEL_VERSION(6,2,0)
+ #if LINUX_VERSION_CODE >= KERNEL_VERSION(6,2,0) || defined(RHEL_9_4_GE)
  static char *devnode(const struct device *dev, umode_t *mode)
  #else
  static char *devnode(struct device *dev, umode_t *mode)
@@ -747,7 +753,12 @@
  
 	 if(!drv_cdev->dev_class) {
 		 cls_created = true;
+
+		 #if defined(RHEL_9_4_GE)
+		 drv_cdev->dev_class = class_create(drv_cdev->drv_cls_str);
+		 #else
 		 drv_cdev->dev_class = class_create(THIS_MODULE, drv_cdev->drv_cls_str);
+		 #endif
 		 if (IS_ERR(drv_cdev->dev_class)) {
 			 ret = PTR_ERR(drv_cdev->dev_class);
 			 PR_ERR("Failed to create class %s. ret : %d",
