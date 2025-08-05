@@ -92,7 +92,7 @@ DIST_ID_CENTOS  = 'CentOS'
 DIST_ID_UBUNTU  = 'Ubuntu'
 DIST_ID_REDHAT  = 'RedHatEnterprise'
 DIST_ID_REDHAT2 = 'RedHatEnterpriseWorkstation'
-DIST_ID_ROCKY   = 'rocky'
+DIST_ID_ROCKY   = 'RockyLinux'
 DIST_ID_SLES    = 'SUSE'
 SUPPORTED_DIST_ID = [
     DIST_ID_CENTOS,

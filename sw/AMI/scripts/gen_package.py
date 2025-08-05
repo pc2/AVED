@@ -193,56 +193,32 @@ def main(args):
         config['system'] = {}
 
         # Get config['system']['distribution_id']
-        # lsb_release not available in RHEL 9. Use os-release in that case
-        if shutil.which('lsb_release'):
-            cmd = [ 'lsb_release', '-is']
-            log_file_name = os.path.abspath(os.path.join(output_dir, 'lsb_release_is.log'))
-            log_info('GEN_PACKAGE-5', 'Get distribution ID')
-            exec_step_cmd('GEN_PACKAGE-15', step, cmd, log_file_name)
-            check_output_file_exists('GEN_PACKAGE-5', log_file_name)
+        cmd = [ 'lsb_release', '-is']
+        log_file_name = os.path.abspath(os.path.join(output_dir, 'lsb_release_is.log'))
+        log_info('GEN_PACKAGE-5', 'Get distribution ID')
+        exec_step_cmd('GEN_PACKAGE-15', step, cmd, log_file_name)
+        check_output_file_exists('GEN_PACKAGE-5', log_file_name)
 
-            log_file = open(log_file_name, mode='r')
-            for line in log_file:
-                config['system']['distribution_id'] = line.split('\n')[0]
-                break
-            log_file.close()
+        log_file = open(log_file_name, mode='r')
+        for line in log_file:
+            config['system']['distribution_id'] = line.split('\n')[0]
+            break
+        log_file.close()
 
-            if config['system']['distribution_id'] not in SUPPORTED_DIST_ID:
-                exit_error('GEN_PACKAGE-14', 'Invalid Distribution ID: ' + config['system']['distribution_id'] + '. Supported values are ' + str(SUPPORTED_DIST_ID))
+        if config['system']['distribution_id'] not in SUPPORTED_DIST_ID:
+            exit_error('GEN_PACKAGE-14', 'Invalid Distribution ID: ' + config['system']['distribution_id'] + '. Supported values are ' + str(SUPPORTED_DIST_ID))
 
-            log_info('GEN_PACKAGE-16', 'Current distribution ID: ' + config['system']['distribution_id'])
+        log_info('GEN_PACKAGE-16', 'Current distribution ID: ' + config['system']['distribution_id'])
 
-            # Get config['system']['distribution_release']
-            cmd = [ 'lsb_release', '-rs']
-            log_file_name = os.path.abspath(os.path.join(output_dir, 'lsb_release_rs.log'))
-            exec_step_cmd('GEN_PACKAGE-15', step, cmd, log_file_name)
-            log_file = open(log_file_name, mode='r')
-            for line in log_file:
-                config['system']['distribution_release'] = line.split('\n')[0]
-                break
-            log_file.close()
-        else:
-            # Use os-release as fallback.
-            cmd = [ 'cat', '/etc/os-release']
-            log_file_name = os.path.abspath(os.path.join(output_dir, 'os-release.log'))
-            log_info('GEN_PACKAGE-5', 'Get distribution ID')
-            log_info('GEN_PACKAGE-5', 'Get distribution release')
-            exec_step_cmd('GEN_PACKAGE-15', step, cmd, log_file_name)
-            check_output_file_exists('GEN_PACKAGE-5', log_file_name)
-
-            log_file = open(log_file_name, mode='r')
-            for line in log_file:
-                if line.startswith('ID='):
-                    config['system']['distribution_id'] = line.split('=', 1)[1].strip().strip('"')
-                if line.startswith('VERSION_ID='):
-                    config['system']['distribution_release'] = line.split('=', 1)[1].strip().strip('"')
-            log_file.close()
-
-            if config['system']['distribution_id'] not in SUPPORTED_DIST_ID:
-                exit_error('GEN_PACKAGE-14', 'Invalid Distribution ID: ' + config['system']['distribution_id'] + '. Supported values are ' + str(SUPPORTED_DIST_ID))
-
-            log_info('GEN_PACKAGE-16', 'Current distribution ID: ' + config['system']['distribution_id'])
-            log_info('GEN_PACKAGE-16', 'Current distribution release: ' + config['system']['distribution_release'])
+        # Get config['system']['distribution_release']
+        cmd = [ 'lsb_release', '-rs']
+        log_file_name = os.path.abspath(os.path.join(output_dir, 'lsb_release_rs.log'))
+        exec_step_cmd('GEN_PACKAGE-15', step, cmd, log_file_name)
+        log_file = open(log_file_name, mode='r')
+        for line in log_file:
+            config['system']['distribution_release'] = line.split('\n')[0]
+            break
+        log_file.close()
 
         # Only use the major release number of CentOS and RedHat
         if config['system']['distribution_id'] in [DIST_ID_CENTOS, DIST_ID_REDHAT, DIST_ID_REDHAT2, DIST_ID_ROCKY]:
